@@ -1,0 +1,19 @@
+{
+    "include": ["./src/**/*"],
+    "exclude": ["./tsdown.config.ts"],
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "verbatimModuleSyntax": true,
+        "forceConsistentCasingInFileNames": true,
+        "target": "esnext",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "lib": ["esnext", "dom"],
+        "declaration": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "alwaysStrict": true,
+        "strict": true
+    }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@catplvsplus/idb",
+  "license": "MIT",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A simple type-safe & promise-based abstracted wrapper for IndexedDB.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.js",
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "browser": "./dist/index.js",
+      "types": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "prepack": "tsdown"
+  },
+  "files": [
+    "./dist",
+    "./README.md",
+    "./LICENSE"
+  ],
+  "devDependencies": {
+    "@vladfrangu/async_event_emitter": "^2.4.7",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
