@@ -29,30 +29,30 @@ export class Transaction<V extends IndexedDBSchema> extends AsyncEventEmitter {
     }
 
     public async awaitComplete(): Promise<void> {
-        const { signal, abort } = new AbortController();
+        const abortController = new AbortController();
 
         const promise = new DeferredPromise<void>();
 
         this.data.addEventListener(
             'complete',
             () => promise.resolve(),
-            { signal, once: true }
+            { signal: abortController.signal, once: true }
         );
 
         this.data.addEventListener(
             'error',
             () => promise.reject(this.data.error),
-            { signal, once: true }
+            { signal: abortController.signal, once: true }
         );
 
         this.data.addEventListener(
             'abort',
             () => promise.reject(new Error('Transaction aborted')),
-            { signal, once: true }
+            { signal: abortController.signal, once: true }
         );
 
         await promise;
-        abort();
+        abortController.abort();
     }
 }
 

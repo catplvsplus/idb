@@ -114,24 +114,24 @@ export class ObjectStore<V> {
     }
 
     public static async promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
-        const { signal, abort } = new AbortController();
+        const abortController = new AbortController();
 
         const promise = new DeferredPromise<T>();
 
         request.addEventListener(
             'success',
             () => promise.resolve(request.result),
-            { signal, once: true }
+            { signal: abortController.signal, once: true }
         );
 
         request.addEventListener(
             'error',
             () => promise.reject(request.error),
-            { signal, once: true }
+            { signal: abortController.signal, once: true }
         );
 
         const result = await promise;
-        abort();
+        abortController.abort();
 
         return result;
     }
