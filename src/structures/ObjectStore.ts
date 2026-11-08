@@ -63,8 +63,8 @@ export class ObjectStore<V> {
         this.data.deleteIndex(name);
     }
 
-    public async *entries(): AsyncGenerator<[IDBValidKey, V], void, void> {
-        const cursorRequest = this.data.openCursor();
+    public async *openIterableCursor(query?: IDBValidKey|IDBKeyRange|null|undefined, direction?: IDBCursorDirection): AsyncGenerator<[IDBValidKey, V], void, void> {
+        const cursorRequest = this.data.openCursor(query, direction);
 
         const awaitCursor = (): Promise<IDBCursorWithValue|null> => {
             return new Promise((resolve, reject) => {
@@ -83,6 +83,12 @@ export class ObjectStore<V> {
         }
     }
 
+    public async *entries(): AsyncGenerator<[IDBValidKey, V], void, void> {
+        for await (const [key, value] of this.openIterableCursor()) {
+            yield [key, value];
+        }
+    }
+
     public async entriesAsync(): Promise<[IDBValidKey, V][]> {
         const entries: [IDBValidKey, V][] = [];
 
@@ -93,16 +99,15 @@ export class ObjectStore<V> {
         return entries;
     }
 
-    public async filter<S extends keyof V>(
-        storeName: S,
-        predicate: (value: V[S], key: IDBValidKey, store: S) => boolean,
+    public async filter(
+        predicate: (value: V, key: IDBValidKey) => boolean,
         limit: number = Infinity
-    ): Promise<V[S][]> {
-        const results: V[S][] = [];
+    ): Promise<V[]> {
+        const results: V[] = [];
 
         for await (const [key, value] of this.entries()) {
-            if (predicate(value[storeName], key, storeName)) {
-                results.push(value[storeName]);
+            if (predicate(value, key)) {
+                results.push(value);
             }
 
             if (results.length >= limit) {
