@@ -105,7 +105,14 @@ export class ObjectStore<V> {
     ): Promise<V[]> {
         const results: V[] = [];
 
-        for await (const [key, value] of this.entries()) {
+        const cursor = this.entries();
+
+        while (true) {
+            const { value: data, done } = await cursor.next();
+            const [key, value] = (data ?? [] )as [IDBValidKey, V];
+
+            if (done) break;
+
             const isMatch = await Promise.resolve(predicate(value, key));
 
             if (isMatch) {
