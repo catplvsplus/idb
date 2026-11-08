@@ -92,7 +92,7 @@ export class ObjectStore<V> {
     public async entriesAsync(): Promise<[IDBValidKey, V][]> {
         const entries: [IDBValidKey, V][] = [];
 
-        for await (const result of this.entries()) {
+        for await (const result of this.openIterableCursor()) {
             entries.push(result);
         }
 
@@ -105,14 +105,7 @@ export class ObjectStore<V> {
     ): Promise<V[]> {
         const results: V[] = [];
 
-        const cursor = this.entries();
-
-        while (true) {
-            const { value: data, done } = await cursor.next();
-            const [key, value] = (data ?? [] )as [IDBValidKey, V];
-
-            if (done) break;
-
+        for await (const [key, value] of this.openIterableCursor()) {
             const isMatch = await Promise.resolve(predicate(value, key));
 
             if (isMatch) {
