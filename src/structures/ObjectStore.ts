@@ -100,13 +100,15 @@ export class ObjectStore<V> {
     }
 
     public async filter(
-        predicate: (value: V, key: IDBValidKey) => boolean,
+        predicate: (value: V, key: IDBValidKey) => boolean|Promise<boolean>,
         limit: number = Infinity
     ): Promise<V[]> {
         const results: V[] = [];
 
         for await (const [key, value] of this.entries()) {
-            if (predicate(value, key)) {
+            const isMatch = await Promise.resolve(predicate(value, key));
+
+            if (isMatch) {
                 results.push(value);
             }
 
